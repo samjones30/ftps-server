@@ -1,0 +1,71 @@
+---
+# main.yml
+
+# install 
+- name: vsftpd | install
+  yum:
+    name: vsftpd
+    state: present
+- name: vsftpd | enable and start
+  service:
+    name: vsftpd
+    enabled: yes
+    state: started
+- name: firewalld | install
+  yum:
+    name: firewalld
+    state: present
+- name: firewalld | enable and start
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+
+#configure firewalld
+- name: firewalld | Open TCP ports in firewalld
+  firewalld:
+    permanent: yes
+    state: enabled
+    port: 21/tcp
+    zone: public
+  notify: reload firewalld
+  
+- name: firewalld | Allow ftp service in firewalld
+  firewalld:
+    service: ftp
+    permanent: yes
+    state: enabled
+    zone: public
+  notify: reload firewalld
+  
+- name: firewalld | Open TLS TCP ports in firewalld
+  firewalld:
+    permanent: yes
+    state: enabled
+    port: 8000-8049/tcp
+    zone: public
+  notify: reload firewalld
+
+#configure vsftpd
+- name: vsftpd | copy configuration
+  template:
+    src: vsftpd.conf
+    dest: /etc/vsftpd/vsftpd.conf
+    mode: 0644
+  notify: restart vsftpd
+
+- name: vsftpd | copy whitelisted users
+  template:
+    src: user_list.conf
+    dest: /etc/vsftpd/user_list.conf
+    mode: 0644
+  notify: restart vsftpd
+  
+#certs config
+- name: vsftpd | create cert folder
+  file:
+    path: /etc/vsftpd/ssl/private/
+    state: directory
+    mode: '0755'
+
+  
