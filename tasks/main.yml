@@ -49,15 +49,15 @@
 #configure vsftpd
 - name: vsftpd | copy configuration
   template:
-    src: vsftpd.conf
-    dest: /etc/vsftpd/vsftpd.conf.j2
+    src: vsftpd.conf.j2
+    dest: /etc/vsftpd/vsftpd.conf
     mode: 0644
   notify: restart vsftpd
 
 - name: vsftpd | copy whitelisted users
   template:
-    src: user_list.conf
-    dest: /etc/vsftpd/user_list.conf.j2
+    src: user_list.conf.j2
+    dest: /etc/vsftpd/user_list.conf
     mode: 0644
   notify: restart vsftpd
   
